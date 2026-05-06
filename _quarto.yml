@@ -9,7 +9,7 @@ book:
   description: |
     A practical guide to statistical methods for biological researchers, 
     covering power analysis, robust tests, experimental design, and more.
-  repo-url: https://github.com/stats001.github.io/p-values-book
+  repo-url: https://github.com/Stats001/p-values-book
   repo-actions: [edit, issue]
   sharing: [twitter, linkedin]
   chapters:

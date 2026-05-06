@@ -3,430 +3,333 @@
 
 Among the advantages of R is that it is free. A large proportion of new statistical methods are developed and first made available in R. The main disadvantage to using R is that it is not based on menus. It requires at least some amount of programming, so it takes more effort to learn. 
 
+
 ## Excel and Prism are not sufficient.
+
 
 Excel and Prism are probably the most widely used software for statistical analysis in biological research. They are both excellent at certain tasks, and I use them often. However, it is either difficult or impossible to use Excel or Prism’s built-in capabilities to perform most of the analyses presented in this book.
 
+
 ## If you don’t want to use R
+
 
 If you don’t want to learn R but want to use the analysis methods in this book, there are many menu-based statistics software packages to choose from. Among the menu-based commercial statistics software packages suitable for the methods in this book are these:
 
 - JMP
-
 - Statistica
-
 - Minitab
 
 They are similarly priced for PCs and have special pricing for academic institutions. If you have not yet bought a statistics package, I’d suggest starting with JMP, as it is quite comprehensive, easy to use, and links to SAS, which enables even larger analyses.
 
+
 ## If you want to use R
+
 
 There are many sources to learn about R, lots of them free. Here are a few that I recommend. I recommend also using R Studio, which is a front-end that makes working with R easier.
 
-**YouTube**** tutorial series on R**
+
+YouTube tutorial series on R
+
 
 Here are three YouTube tutorial series on R that I particularly recommend. 
 
+
 Phil Chan Statistics with R for newbies
 
-[https://www.youtube.com/playlist?list=PL926147BD8DE746D6](https://www.youtube.com/playlist?list=PL926147BD8DE746D6)
+
+https://www.youtube.com/playlist?list=PL926147BD8DE746D6
+
 
 Marinstatslectures R Programming & Statistics
 
-[https://www.youtube.com/@marinstatlectures](https://www.youtube.com/@marinstatlectures)
+
+https://www.youtube.com/@marinstatlectures
+
+- 
 
 Statistics Christoph Scherber
 
+
 https://www.youtube.com/@ChristophScherber
 
-**Textbooks available free online**
+
+Textbooks available free online
+
 
 "Statistics Using R with Biological Examples" by Kim Seefeld and Ernst Linder. Free PDF: 
 
+
 cran.r-project.org/doc/contrib/Seefeld_StatsRBio.pdf
+
 
 "Using R for Introductory Statistics" by John Verzani. Free PDF:
 
+
 cran.r-project.org/doc/contrib/Verzani-SimpleR.pdf
+
 
 "OpenIntro Statistics" by David M Diez, Christopher D Barr, Mine Çetinkaya-Rundel. Free textbook PDF, practice labs in R and SAS, and videos: 
 
+
 www.openintro.org/stat/
+
 
 The R book by Michael Crawley. Free PDF:
 
+
 https://www.cs.upc.edu/~robert/teaching/estadistica/TheRBook.pdf
+
 
 Several other free PDF textbooks are available at the CRAN website:
 
-[https://cran.r-project.org/doc/contrib/](https://cran.r-project.org/doc/contrib/)
+
+https://cran.r-project.org/doc/contrib/
+
 
 Slides for an introductory tutorial on R and R Studio are available here:
 
-[https://stats.oarc.ucla.edu/r/seminars/intro/](https://stats.oarc.ucla.edu/r/seminars/intro/)
 
-**Installing R and R Studio**
+https://stats.oarc.ucla.edu/r/seminars/intro/
+
+
+Installing R and R Studio
+
 
 On Youtube, search for “download and install R and R Studio” to find several videos that explain how to get started.
 
+
 A fairly quick and easy way to install both R and R Studio is to go to the RStudio website:
 
-```
-[https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/)
-```
+
+https://www.rstudio.com/products/rstudio/download/
 
 
-```
+When you get to the webpage https://cran.rstudio.com/ you will see the following.
 
-```
-
-
-When you get to the webpage [https://cran.rstudio.com/](https://cran.rstudio.com/) you will see the following.
 
 Click on “install R for the first time” and follow the instructions to download the current version of R.
 
+
 Text instructions for downloading and installing R are available at these websites:
 
-[https://www.dataquest.io/blog/installing-r-on-your-computer/](https://www.dataquest.io/blog/installing-r-on-your-computer/)
 
-[https://rstudio-education.github.io/hopr/starting.html](https://rstudio-education.github.io/hopr/starting.html)
+https://www.dataquest.io/blog/installing-r-on-your-computer/
+
+
+https://rstudio-education.github.io/hopr/starting.html
+
 
 You can download the R software directly from the R project web page:
 
+
 http://www.r-project.org 
+
 
 This is the main site for information on R. At this site are directions for installing R, accompanying packages and other sources of documentation. Instructions for installing R for Linux are on this website.
 
-**If R or**** R**** ****Studio ****freezes ****on your computer**
+
+If R or R Studio freezes on your computer
+
 
 If R or R Studio freezes, you can usually unfreeze it by pressing the "Esc" escape key. 
 
+
 Rarely, you will need to halt R or R Studio. For a Windows computer, you can cancel any program using the Task Manager. To start the Task Manager, press Ctrl-Alt-Delete. Select the Task Manager, then select the program you want to halt.
 
-**Index**
 
-```
+Index
+
+
 adjusted R-squared, 116
-```
 
 
-```
 alpha, 31, 37, 189, 191
-```
 
 
-```
 American Statistical Association, 203
-```
 
 
-```
 analysis of variance, 13, 72, 184
-```
 
 
-```
 anova, 17
-```
 
 
-```
 ASA Statement on p-Values, 203
-```
 
 
-```
 balanced design, 119
-```
 
 
-```
 Bonferroni, 193, 198
-```
 
 
-```
 categorical response, 141
-```
 
 
-```
 chi-squared, 133
-```
 
 
-```
 Cochran-Mantel-Haenszel, 133, 150
-```
 
 
-```
 Collinearity Diagnostics, 117
-```
 
 
-```
 co-primary analyses, 189
-```
 
 
-```
 correlated variables, 109
-```
 
 
-```
 correlation, 193
-```
 
 
-```
 effect size, 35, 37
-```
 
 
-```
 factorial designs, 23
-```
 
 
-```
 false discovery rate, 202
-```
 
 
-```
 Fisher Exact, 133, 149
-```
 
 
-```
 fractional factorial designs, 181
-```
 
 
-```
 hierarchical testing, 189, 201
-```
 
 
-```
 Holm’s test, 193, 199
-```
 
 
-```
 interaction, 88
-```
 
 
-```
 Kruskal-Wallis, 70, 72
-```
 
 
-```
 lasso, 118
-```
 
 
-```
 logistic regression, 152
-```
 
 
-```
 means, 30
-```
 
 
-```
 median, 71
-```
 
 
-```
 multiple comparison, 195
-```
 
 
-```
 multiple hypothesis testing, 195
-```
 
 
-```
 multiple regression, 120
-```
 
 
-```
 non-normal, 61, 76
-```
 
 
-```
 null hypothesis, 195
-```
 
 
-```
 ordered categorical variable, 146
-```
 
 
-```
 ordered categorical variables, 133, 137
-```
 
 
-```
 ordinal logistic regression, 152
-```
 
 
-```
 outliers, 61
-```
 
 
-```
 paired t-test, 67
-```
 
 
-```
 partial least squares, 118
-```
 
 
-```
 pilot study, 41
-```
 
 
-```
 population, 53
-```
 
 
-```
 populations, 49
-```
 
 
-```
 power, 18, 29, 191
-```
 
 
-```
 principal components regression, 118
-```
 
 
-```
 probability, 45, 56, 196
-```
 
 
-```
 protocol, 117
-```
 
 
-```
 rank, 61
-```
 
 
-```
 regression, 13
-```
 
 
-```
 Rfit, 70, 90, 93
-```
 
 
-```
 ridge regression, 118
-```
 
 
-```
 sample size, 13, 32, 37, 45, 51, 67, 191
-```
 
 
-```
 simulate, 46
-```
 
 
-```
 simulation, 57
-```
 
 
-```
 standard deviation, 30, 35, 37, 42, 75, 191
-```
 
 
-```
 statistical analysis plan, 117
-```
 
 
-```
 tolerance, 117
-```
 
 
-```
 t-test, 55
-```
 
 
-```
 t-tests, 13
-```
 
 
-```
 two-way anova, 87
-```
 
 
-```
 type I error, 197
-```
 
 
-```
 variability, 19, 21, 30, 42
-```
 
 
-```
 variance, 53, 115
-```
 
 
-```
 Variance Inflation Factor, 117
-```
 
 
-```
 Wilcoxon rank sum, 62
-```
 
 
-```
 Wilcoxon signed rank test, 67
-```
-
-
