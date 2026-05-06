@@ -1,0 +1,244 @@
+# Rescue Failed Experiments Using Fractional Factorial Designs
+
+
+Have you ever had a failed experiment? I certainly have. All the measurements came out as 0, or the cells died, or the seeds didn’t sprout, or even the positive controls came out negative.
+
+How can you quickly figure out what is going wrong with the minimum amount of work? Which factors are affecting the response? The answer is fractional factorial designs.
+
+## Example: How to bake good cookies: A fractional factorial experiment
+
+As a familiar example, suppose we are baking cookies, but we keep ending up with a lot of burnt cookies, a lot of soggy undercooked cookies, or a lot of bad tasting cookies. We want to maximize the yield of good tasting cookies. How do we quickly find out what is going wrong?
+
+We think of 7 factors that might be affecting the yield of good tasting cookies:
+
+- Flour type (white or brown)
+
+- Temperature in the oven (low or high)
+
+- Baking soda amount (low or high)
+
+- Time in the oven (short or long)
+
+- Water amount (low or high)
+
+- Sifting (sift or no)
+
+- Butter amount (low or high)
+
+Here is a fractional factorial design to analyze cookie yield versus these 7 factors in only 8 batches of cookies. R code to create this cookie.data data set is at the end of the chapter.
+
+| batch | flour | temp | soda | time | water | sift | butter | yield of good cookies |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | brown | low | low | long | high | sift | low | 47 |
+| 2 | white | low | low | short | low | sift | high | 74 |
+| 3 | brown | high | low | short | high | no | high | 84 |
+| 4 | white | high | low | long | low | no | low | 62 |
+| 5 | brown | low | high | long | low | no | high | 53 |
+| 6 | white | low | high | short | high | no | low | 78 |
+| 7 | brown | high | high | short | low | sift | low | 87 |
+| 8 | white | high | high | long | high | sift | high | 60 |
+
+- Each row (1 to 8) is a batch of cookies. 
+
+- The 7 columns flour, temp, … butter, are the factor levels to use to use in each batch. 
+
+- The last column is the yield of good cookies observed after baking each batch using the specified levels for each factor.
+
+For example, for the combination of factors in batch 1 (flour = brown, temp = low, etc.), the yield is 47 good cookies.
+
+Notice in the cookie data that each level of each factor gets tested in 4 batches. For example, the variable time is long in batches 1, 4, 5, and 8. It is short in batches 2, 3, 6, and 7.
+
+To calculate the effect of the variable time, we calculate the difference between mean yield for long and mean yield for short times:
+
+- Mean yield when time is long = mean of (47, 62, 53, 60) = 55.5
+
+- Mean yield when time is short = mean of (74, 84, 78, 87) = 80.75
+
+- Difference in yield between long time and short time = 80.75 – 55.5 = 25.25
+
+This can be calculated in R using the aggregate function.
+
+with(cookie.data, aggregate(yield ~ time, FUN = mean))
+
+   time yield
+
+1  long 55.50
+
+2 short 80.75
+
+Below I show ways to do the calculations using R. They can also be done readily with a spreadsheet.
+
+One way to see which factors are important is by plotting the averages for each level of the factors with the R function plot.design(cookie.data).
+
+The graph that plot.design(cookie.data) produces shows each factor on the x-axis, and the average yield at each level of the factor on the y axis. The factor “time” has the biggest difference between settings: a yield near 80 for a short time in the oven versus a yield near 55 for a long time in the oven. From the graph we see that time has the largest effect on yield, followed by temperature. The other factors seem to have little effect on yield.
+
+Batch 7, with 87 good cookies, and batch 3, with 84 good cookies, are the best. Which factor levels are giving us the high yields? We would like to know the average yield for each variable when it is at each level. As shown above, we use the R function aggregate().
+
+with(cookie.data, aggregate(yield ~ time, FUN = mean))
+
+   time yield
+
+1  long 55.50
+
+2 short 80.75
+
+The average yield with time long is 55.5 good cookies, while the average yield with time short is 80.75 good cookies. The difference is 80.72 – 55.5 = 25.25 good cookies. Apparently leaving them in the oven too long may be giving us a lot of burnt cookies.
+
+We can get the difference between the levels for each factor using the R lm() and summary() functions. These give the results for an analysis of variance of the cookie data, which report the difference between levels for each factor.
+
+lm.cookie = lm(yield ~ ., data= cookie.data)
+
+summary(lm.cookie)
+
+Coefficients:
+
+            Estimate Std. Error t value Pr(>|t|)
+
+(Intercept)    61.50        NaN     NaN      NaN
+
+flourwhite      0.75        NaN     NaN      NaN
+
+templow       -10.25        NaN     NaN      NaN
+
+sodalow        -2.75        NaN     NaN      NaN
+
+timeshort      25.25        NaN     NaN      NaN
+
+waterlow        1.75        NaN     NaN      NaN
+
+siftsift       -2.25        NaN     NaN      NaN
+
+butterlow       0.75        NaN     NaN      NaN
+
+The output from the lm() and summary() functions confirms what we saw in the graph, and gives us the quantitative differences: 25.25 for time, -10.25 for temperature, and values near 1 or 2 for the other factors. (The NaN values occur because we are fitting 7 variables plus an intercept with 8 observations. This leaves 0 degrees of freedom so standard error cannot be calculated.)
+
+Suppose for a moment that "sifting" was a labor-intensive or expensive step. This experiment would be evidence that the step could be eliminated with little effect on yield. The observed yield is actually 2.25 lower when sifting is done.
+
+Suppose that butter was an expensive reagent. This experiment would suggest that the butter might be used with little effect on yield.
+
+Consider now how much we have learned with only 8 batches: 
+
+- We have identified 2 important factors.
+
+- We have evidence that the other factors have little effect on yield.
+
+- We have evidence that a labor-intensive step might be eliminated.
+
+- We have evidence that the amount of an expensive reagent could be reduced.
+
+How many batches would it take to get this information if we did not use a fractional factorial design? If we did one-variable-at-a-time (OVAT), we might do the following.
+
+- Run 1 batch with white flour and 1 batch with brown flour = 2 batches for flour.
+
+- Run 1 batch with temp low and 1 batch with temp high = 2 batches for temp.
+
+- And so on for all 7 factors. 
+
+This OVAT method would require 7 factors * 2 batches per factor = 14 batches, compared to the 8 batches for the factorial experiment design. But OVAT has an even bigger weakness: each level of each factor is only examined in 1 batch. In contrast, in the factorial experiment design, each level of each factor is examined in 4 batches. These additional replicates give much more reliable estimates of the effects, and much greater power to detect statistical significance and get p < 0.05 for the effect of a factor.
+
+How do we get the p-values for the effect of the factors? For this example, the graph indicates that temperature and time are the important factors. We can re-run the lm() and summary() analyses using just these two factors, which will give us the p-values.
+
+lm.cookie.2vars = lm(yield ~ time + temp, data= cookie.data)
+
+summary(lm.cookie.2vars)
+
+Coefficients:
+
+            Estimate Std. Error t value Pr(>|t|)    
+
+(Intercept)   60.625      1.588   38.18 2.32e-07 ***
+
+timeshort     25.250      1.834   13.77 3.63e-05 ***
+
+templow      -10.250      1.834   -5.59  0.00253 ** 
+
+The analysis shows that both time and temperature have significant effects (p < 0.05). The negative coefficient of -10.25 for templow indicates that low temperatures give worse yield. The positive coefficient for timeshort indicates that short time increases yield.
+
+We can do a test for an interaction between time and temperature in their effect on yield.
+
+lm.cookie.2vars.interaction = lm(yield ~ time * temp, data= cookie.data)
+
+summary(lm.cookie.2vars.interaction)
+
+Coefficients:
+
+                  Estimate Std. Error t value Pr(>|t|)    
+
+(Intercept)         61.000      2.016  30.264  7.1e-06 ***
+
+timeshort           24.500      2.850   8.595  0.00101 ** 
+
+templow            -11.000      2.850  -3.859  0.01816 *  
+
+timeshort:templow    1.500      4.031   0.372  0.72869
+
+In this case, the interaction test is not significant (p = 0.73), so we can just use the analyses of the main effects.
+
+## Additional resources
+
+For an introduction to fractional factorial designs, see the Youtube video “Experiments 4A – the trade-offs when doing half-fraction factorials” by Kevin Dunn.
+
+A free PDF of the text "A First Course in Design and Analysis of Experiments" by Gary Oehlert is available at this website http://users.stat.umn.edu/~gary/Book.html.
+
+For examples of how to do analyses of factorial designs and fractional factorial designs using R, see the textbook “Design and Analysis of Experiments with R”. by John Lawson. CRC Press, and the accompanying R package "daewr". 
+
+# R code to create the cookie.data data set 
+
+mystring.levels="batch, flour, temp, soda, time, water, sift, butter, yield
+
+1,brown,low,low,long,high,sift,low,47
+
+2,white,low,low,short,low,sift,high,74
+
+3,brown,high,low,short,high,no,high,84
+
+4,white,high,low,long,low,no,low,62
+
+5,brown,low,high,long,low,no,high,53
+
+6,white,low,high,short,high,no,low,78
+
+7,brown,high,high,short,low,sift,low,87
+
+8,white,high,high,long,high,sift,high,60"
+
+cookie.data=read.table(textConnection(mystring.levels),header=TRUE,sep=",",row.names="batch")
+
+# Turn the variables into factors to be able to use plot.design()
+
+cookie.data$flour = factor(cookie.data$flour)
+
+cookie.data$temp = factor(cookie.data$temp)
+
+cookie.data$soda = factor(cookie.data$soda)
+
+cookie.data$time = factor(cookie.data$time)
+
+cookie.data$water = factor(cookie.data$water)
+
+cookie.data$sift = factor(cookie.data$sift)
+
+cookie.data$butter = factor(cookie.data$butter)
+
+cookie.data
+
+  flour temp soda  time water sift butter yield
+
+1 brown  low  low  long  high sift    low    47
+
+2 white  low  low short   low sift   high    74
+
+3 brown high  low short  high   no   high    84
+
+4 white high  low  long   low   no    low    62
+
+5 brown  low high  long   low   no   high    53
+
+6 white  low high short  high   no    low    78
+
+7 brown high high short   low sift    low    87
+
+8 white high high  long  high sift   high    60
+
+ 
+
