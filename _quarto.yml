@@ -1,0 +1,68 @@
+project:
+  type: book
+
+book:
+  title: "How to Get P-Values Less Than 0.05 in Biological Research"
+  subtitle: "Practical examples of how to increase power, reduce sample size, and choose better statistics tests"
+  author: "Michael Walker"
+  date: "2024-06-11"
+  description: |
+    A practical guide to statistical methods for biological researchers, 
+    covering power analysis, robust tests, experimental design, and more.
+  repo-url: https://github.com/stats001.github.io/p-values-book
+  repo-actions: [edit, issue]
+  sharing: [twitter, linkedin]
+  chapters:
+    - index.qmd
+    - chapters/ch01-avoid-ttests.qmd
+    - chapters/ch02-power-sample-size.qmd
+    - chapters/ch03-reduce-variability.qmd
+    - chapters/ch04-wilcoxon-kruskal.qmd
+    - chapters/ch05-robust-tests.qmd
+    - chapters/ch06-interactions.qmd
+    - chapters/ch07-correlated-variables.qmd
+    - chapters/ch08-balancing-variables.qmd
+    - chapters/ch09-cmh-tests.qmd
+    - chapters/ch10-avoid-categorical.qmd
+    - chapters/ch11-factorial-design.qmd
+    - chapters/ch12-fractional-factorial.qmd
+    - chapters/ch13-co-primary-analyses.qmd
+    - chapters/ch14-multiple-testing.qmd
+    - chapters/ch15-right-goal.qmd
+    - chapters/ch16-p-greater-05.qmd
+    - chapters/ch17-software.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+    code-fold: false
+    code-tools: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 2
+    highlight-style: github
+    fig-align: center
+  pdf:
+    documentclass: scrbook
+    classoption: [oneside]
+    papersize: letter
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    highlight-style: github
+    fig-align: center
+    include-in-header:
+      text: |
+        \usepackage{booktabs}
+        \usepackage{longtable}
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  cache: false
