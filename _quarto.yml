@@ -31,6 +31,7 @@ book:
     - chapters/ch15-right-goal.qmd
     - chapters/ch16-p-greater-05.qmd
     - chapters/ch17-software.qmd
+    - chapters/index-terms.qmd
 
 bibliography: references.bib
 
@@ -39,6 +40,7 @@ format:
     theme:
       light: flatly
       dark: darkly
+    css: custom.css
     code-fold: false
     code-tools: true
     toc: true
@@ -60,9 +62,17 @@ format:
       text: |
         \usepackage{booktabs}
         \usepackage{longtable}
+        \usepackage{fvextra}
+        \usepackage{framed}
+        \usepackage{xcolor}
+        \definecolor{codebg}{RGB}{245,245,245}
+        \definecolor{outputbg}{RGB}{228,228,228}
+        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\},bgcolor=codebg}
+        \DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines,bgcolor=outputbg}
 
 execute:
   echo: true
+  eval: true
   warning: false
   message: false
-  cache: false
+  freeze: auto

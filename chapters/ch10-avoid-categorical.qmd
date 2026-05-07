@@ -1,10 +1,65 @@
 # Avoid Turning Quantitative Variables into Categorical Variables
 
+```{r}
+#| include: false
+# install.packages("vcdExtra")
+library(vcdExtra)
+
+# SBP data
+set.seed(11111)
+drug   = round(rnorm(n=20, mean= -10, sd=20), 0)
+placebo= round(rnorm(n=20, mean=  10, sd=20), 0)
+treatment  = c(rep("Drug",    length(drug)),
+               rep("Placebo", length(placebo)))
+SBP.change = c(drug, placebo)
+SBP.data   = data.frame(treatment, SBP.change)
+
+SBP.data = within(SBP.data, {
+  SBP.change.category = NA
+  SBP.change.category[SBP.change <  0] = "Improved"
+  SBP.change.category[SBP.change >= 0] = "Not Improved"
+})
+
+SBP.change.category.table = with(SBP.data,
+  table(SBP.change.category, treatment))
+
+# Cholesterol data
+drug.mean       = 190
+placebo.mean    = 210
+sd.cholesterol  = 50
+n.per.group     = 100
+set.seed(3)
+drug    = round(rnorm(n=n.per.group, mean=drug.mean,    sd=sd.cholesterol), 0)
+placebo = round(rnorm(n=n.per.group, mean=placebo.mean, sd=sd.cholesterol), 0)
+treatment   = c(rep("Drug",    length(drug)),
+                rep("Placebo", length(placebo)))
+cholesterol = c(drug, placebo)
+cholesterol.data = data.frame(treatment, cholesterol)
+
+cholesterol.data = within(cholesterol.data, {
+  cholesterol.LT200 = NA
+  cholesterol.LT200[cholesterol <  200] = "LT200"
+  cholesterol.LT200[cholesterol >= 200] = "GTE200"
+})
+
+cholesterol.data = within(cholesterol.data, {
+  cholesterol.category = NA
+  cholesterol.category[cholesterol <  200]                    = "LT200"
+  cholesterol.category[cholesterol >= 200 & cholesterol < 240]= "GTE200LT240"
+  cholesterol.category[cholesterol >= 240]                    = "GTE240"
+})
+
+LT.200.table = with(cholesterol.data,
+  table(cholesterol.LT200, treatment))
+
+cholesterol.ordered.table = with(cholesterol.data,
+  table(treatment, cholesterol.category))
+```
+
 
 You may sometimes consider turning a quantitative response variable into a categorical response variable. Here are two examples where a collaborator may suggest creating a categorical response.
 
 - A drug is intended to lower blood pressure. A collaborator suggests testing if there is a difference between drug and placebo in the proportion of subjects whose blood pressure decreases. This would change a quantitative measure (the actual measured change from baseline) into a categorical variable (Improved or not Improved).
-- 
 - A drug is intended to reduce serum cholesterol. A collaborator suggests that the response variable should be defined as categorical: either normal cholesterol (< 200) or elevated cholesterol (>= 200). Let’s see how using categories affects power, sample size, and p-values.
 
 In a few cases, as we’ll discuss, this can be helpful. But in most cases, turning a quantitative response variable into a categorical variable will reduce power, increase required sample size, and make your p-values worse.
@@ -24,17 +79,6 @@ For our first example, suppose that the treatment is drug or placebo, and the re
 We’ll use simulated data on an experiment in which subjects received either drug or placebo, and their systolic blood pressure was measured 3 months later. Here are the first 5 rows of the data. The complete data set is at the end of the chapter. 
 
 
-```{r}
-> SBP.data
-   treatment SBP.change SBP.change.category
-1       Drug        -10            Improved
-2       Drug          6        Not Improved
-3       Drug          8        Not Improved
-4       Drug        -34            Improved
-5       Drug        -35            Improved
-```
-
-
 Here are boxplots of the data.
 
 
@@ -51,7 +95,10 @@ Here is the t-test.
 
 ```{r}
 with(SBP.data, t.test(SBP.change ~ treatment)) 
+```
 
+
+```{.r-output}
 Welch Two Sample t-test
 
 data:  SBP.change by treatment
@@ -71,9 +118,7 @@ The t-test indicates that there is a significant difference between drug and pla
 Now use a Fisher Exact test to compare the proportion Improved in each treatment arm. The Fisher test requires a table as input, so we first create the table.
 
 
-```{r}
-SBP.change.category.table = with(SBP.data, table(SBP.change.category, treatment))
-
+```{.r-output}
 SBP.change.category.table
 
                    treatment
@@ -88,17 +133,6 @@ Run the Fisher Exact test.
 
 ```{r}
 fisher.test(SBP.change.category.table) 
-
-Fisher's Exact Test for Count Data
-
-data:  SBP.change.category.table
-p-value = 0.111
-alternative hypothesis: true odds ratio is not equal to 1
-95 percent confidence interval:
-  0.7972704 15.9709807
-sample estimates:
-odds ratio 
-  3.385212 
 ```
 
 
@@ -110,17 +144,6 @@ Let’s compare the sample size required for a t-test using the measured values 
 
 ```{r}
 power.t.test(delta = 20, sd=20, power=0.8)
- 
-     Two-sample t test power calculation 
-
-              n = 16.71477
-          delta = 20
-             sd = 20
-      sig.level = 0.05
-          power = 0.8
-    alternative = two.sided
-
-NOTE: n is number in *each* group
 ```
 
 
@@ -156,18 +179,6 @@ We can calculate sample size and power for a test for a difference of proportion
 
 ```{r}
 power.prop.test(p1=0.69, p2=0.31, power = 0.8)
-
-
-     Two-sample comparison of proportions power calculation 
-
-              n = 25.9665
-             p1 = 0.69
-             p2 = 0.31
-      sig.level = 0.05
-          power = 0.8
-    alternative = two.sided
-
-NOTE: n is number in *each* group
 ```
 
 
@@ -197,18 +208,6 @@ Here are the first 10 rows of the data set, cholesterol.data. R code to generate
 
 ```{r}
 head(cholesterol.data, 10)
-
-   treatment cholesterol cholesterol.LT200 cholesterol.category
-1       Drug         142             LT200                LT200
-2       Drug         175             LT200                LT200
-3       Drug         203            GTE200          GTE200LT240
-4       Drug         132             LT200                LT200
-5       Drug         200            GTE200          GTE200LT240
-6       Drug         192             LT200                LT200
-7       Drug         194             LT200                LT200
-8       Drug         246            GTE200               GTE240
-9       Drug         129             LT200                LT200
-10      Drug         253            GTE200               GTE240
 ```
 
 
@@ -225,26 +224,13 @@ Here is the t-test for cholesterol versus treatment. The p-value of 0.0038 indic
 
 ```{r}
 with(cholesterol.data, t.test(cholesterol ~ treatment))
-
-Welch Two Sample t-test
-
-data:  cholesterol by treatment
-t = -2.9272, df = 186.85, p-value = 0.003845
-alternative hypothesis: true difference in means is not equal to 0
-95 percent confidence interval:
- -34.131508  -6.648492
-sample estimates:
-   mean in group Drug mean in group Placebo 
-               190.55                210.94
 ```
 
 
 In the cholesterol.data the column “cholesterol.LT200” is a categorical variable with 2 categories: less than 200 versus 200 or higher. We can use a Fisher Exact test to test if there is a difference between drug and placebo using cholesterol.LT200 as the response variable. We need to create a table to input to the Fisher Exact test.
 
 
-```{r}
-LT.200.table = with(cholesterol.data, table(cholesterol.LT200, treatment))
-
+```{.r-output}
 LT.200.table
 
 
@@ -263,17 +249,6 @@ Here is the Fisher Exact test using this table.
 
 ```{r}
 fisher.test(LT.200.table)
-
-Fisher's Exact Test for Count Data
-
-data:  LT.200.table
-p-value = 0.2029
-alternative hypothesis: true odds ratio is not equal to 1
-95 percent confidence interval:
- 0.368984 1.213068
-sample estimates:
-odds ratio 
- 0.6706832
 ```
 
 
@@ -289,21 +264,10 @@ Because we have an ordered categorical variable, we will use the Cochran-Mantel-
 To run the CMHtest in R, install the vcdExtra package and load the library.
 
 
-```{r}
-install.packages(“vcdExtra”)
-library(vcdExtra)
-```
-
-
 The CMHtest requires a table as input. We can create the two-way table from the raw data using the table() function.
 
 
-```{r}
-cholesterol.ordered.table = with(cholesterol.data, table(treatment, cholesterol.category))
-```
-
-
-```{r}
+```{.r-output}
 cholesterol.ordered.table
 
          cholesterol.category
@@ -318,14 +282,6 @@ We pass this table to the CMHtest() function.
 
 ```{r}
 CMHtest(cholesterol.ordered.table)
-
-Cochran-Mantel-Haenszel Statistics for treatment by cholesterol.category 
-
-                 AltHypothesis  Chisq Df     Prob
-cor        Nonzero correlation 5.4953  1 0.019067
-rmeans  Row mean scores differ 5.4953  1 0.019067
-cmeans  Col mean scores differ 8.0200  2 0.018134
-general    General association 8.0200  2 0.018134
 ```
 
 
@@ -360,19 +316,19 @@ Ordinal logistic regression is available in the R package polr. The UCLA statist
 I’ve occasionally encountered situations in which it was helpful to turn a quantitative variable into a categorical variable. Here are some examples.
 
 
-Extremely inaccurate quantitative measurements
+**Extremely inaccurate quantitative measurements**
 
 
 If the supposed “quantitative” measurements of a variable are extremely inaccurate the quantitative information may be less informative than categories. In a data set that I examined many years ago, the supposed “quantitative” measure was the expression level of a gene, based on fragments of mRNA recovered from (some quite old) paraffin-embedded tumor blocks. If you have tried this yourself, you likely know that the mRNA is highly fragmented, and the resulting gene fragments can be difficult to assemble into a complete sequence. At the time I was doing this, the human genome project had not been completed, so we had no reference sequence for many genes. I examined correlations among genes known to be in the same regulatory pathways, or known to have related biological function, but found none of the results made any sense. Eventually I replaced the “quantitative” measure with a categorical indicator that a particular gene was either found expressed or not found in a particular tissue specimen. Instead of correlation, I used a Fisher Exact test to examine the cooccurrence of genes. The analyses using the categorical indicator variable and Fisher Exact test were able to reproduce known associations and contributed to finding likely functions of many genes. So, in this case, turning a quantitative variable into a categorical variable proved useful.
 
 
-Biologically meaningful categories
+**Biologically meaningful categories**
 
 
 In some cases, an easily obtained measured variable such as age may be a proxy for a biologically meaningful category, such as pre-menopausal versus post-menopausal status. For a model of cancer versus gene expression, we might consider adding age as a covariate, as a proxy for menopausal status. If the true menopausal status is the biologically meaningful covariate, but it is not known, then an analysis may yield better results if we create a categorical variable such as, for example, age less than 50 versus age 50 or greater as a proxy. We might alternatively consider 3 ordered categories for age, such as <50, 50 to 60, and over 60, corresponding to pre-, peri-, and post-menopausal.
 
 
-Non-linear response
+**Non-linear response**
 
 
 In some cases, the relationship between two quantitative variables may not be a straight line. Testing using correlation or regression may not work well. In this case, it can be useful to split one or both variables into meaningful categories and use either ANOVA or CMH to test for association.
@@ -387,18 +343,7 @@ SBP.data
 Use set.seed to make the randomly generated data from the rnorm function  reproducible.
 
 
-```{r}
-set.seed(11111)
-drug=round(rnorm(n=20, mean= -10, sd=20), 0)
-placebo=round(rnorm(n=20, mean= 10, sd=20), 0)
-treatment = c(rep("Drug", length(drug)), rep("Placebo", length(placebo)))
-SBP.change = c(drug, placebo)
-SBP.data = data.frame(treatment, SBP.change)
-
-SBP.data = within(SBP.data,
-{SBP.change.category = NA                             SBP.change.category[SBP.change<0] = "Improved"
-SBP.change.category[SBP.change >= 0] = "Not Improved"})
-
+```{.r-output}
 SBP.data
 
    treatment SBP.change SBP.change.category
@@ -448,30 +393,6 @@ SBP.data
 Cholesterol data set
 
 
-```{r}
-drug.mean = 190
-placebo.mean = 210
-sd.cholesterol = 50
-n.per.group = 100
-set.seed(3) 
-drug=round(rnorm(n=n.per.group, mean = drug.mean, sd=sd.cholesterol),0)
-placebo=round(rnorm(n=n.per.group, mean = placebo.mean, sd=sd.cholesterol),0)
-treatment = c(rep("Drug", length(drug)), rep("Placebo", length(placebo)))
-cholesterol = c(drug, placebo)
-
-cholesterol.data = data.frame(treatment, cholesterol)
-
-cholesterol.data = within(cholesterol.data,
-                          {cholesterol.LT200 = NA
-                          cholesterol.LT200[cholesterol<200] = "LT200"
-                          cholesterol.LT200[cholesterol>=200] = "GTE200"
-})
-
-cholesterol.data = within(cholesterol.data,
-                                {cholesterol.category = NA
-                                cholesterol.category[cholesterol<200] = "LT200"
-                                cholesterol.category[cholesterol>=200 & cholesterol<240] = "GTE200LT240"
-                                cholesterol.category[cholesterol >= 240] = "GTE240"})
-
+```{.r-output}
 cholesterol.data$cholesterol.category = factor(cholesterol.data$cholesterol.category, levels = c("LT200","GTE200LT240", "GTE240"))
 ```

@@ -1,5 +1,19 @@
 # Rescue Failed Experiments Using Fractional Factorial Designs
 
+```{r}
+#| include: false
+cookie.data <- tibble::tribble(
+  ~batch, ~flour,   ~temp,  ~soda,  ~time,  ~water, ~sift,   ~butter, ~yield,
+       1, "brown",  "low",  "low",  "long",  "high", "sift",  "low",      47,
+       2, "white",  "low",  "low",  "short", "low",  "sift",  "high",     74,
+       3, "brown",  "high", "low",  "short", "high", "no",    "high",     84,
+       4, "white",  "high", "low",  "long",  "low",  "no",    "low",      62,
+       5, "brown",  "low",  "high", "long",  "low",  "no",    "high",     53,
+       6, "white",  "low",  "high", "short", "high", "no",    "low",      78,
+       7, "brown",  "high", "high", "short", "low",  "sift",  "low",      87,
+       8, "white",  "high", "high", "long",  "high", "sift",  "high",     60
+) |> dplyr::mutate(dplyr::across(where(is.character), as.factor))
+```
 
 Have you ever had a failed experiment? I certainly have. All the measurements came out as 0, or the cells died, or the seeds didn’t sprout, or even the positive controls came out negative.
 
@@ -25,6 +39,19 @@ We think of 7 factors that might be affecting the yield of good tasting cookies:
 
 Here is a fractional factorial design to analyze cookie yield versus these 7 factors in only 8 batches of cookies. R code to create this cookie.data data set is at the end of the chapter.
 
+| Batch | Flour | Temp | Soda | Time | Water | Sift | Butter | Yield |
+|-------|-------|------|------|------|-------|------|--------|-------|
+| 1 | brown | low | low | long | high | sift | low | 47 |
+| 2 | white | low | low | short | low | sift | high | 74 |
+| 3 | brown | high | low | short | high | no | high | 84 |
+| 4 | white | high | low | long | low | no | low | 62 |
+| 5 | brown | low | high | long | low | no | high | 53 |
+| 6 | white | low | high | short | high | no | low | 78 |
+| 7 | brown | high | high | short | low | sift | low | 87 |
+| 8 | white | high | high | long | high | sift | high | 60 |
+
+
+
 - Each row (1 to 8) is a batch of cookies. 
 - The 7 columns flour, temp, … butter, are the factor levels to use to use in each batch. 
 - The last column is the yield of good cookies observed after baking each batch using the specified levels for each factor.
@@ -46,6 +73,10 @@ This can be calculated in R using the aggregate function.
 
 ```{r}
 with(cookie.data, aggregate(yield ~ time, FUN = mean))
+```
+
+
+```{.r-output}
    time yield
 1  long 55.50
 2 short 80.75
@@ -66,9 +97,6 @@ Batch 7, with 87 good cookies, and batch 3, with 84 good cookies, are the best. 
 
 ```{r}
 with(cookie.data, aggregate(yield ~ time, FUN = mean))
-   time yield
-1  long 55.50
-2 short 80.75
 ```
 
 
@@ -81,17 +109,6 @@ We can get the difference between the levels for each factor using the R lm() an
 ```{r}
 lm.cookie = lm(yield ~ ., data= cookie.data)
 summary(lm.cookie)
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)
-(Intercept)    61.50        NaN     NaN      NaN
-flourwhite      0.75        NaN     NaN      NaN
-templow       -10.25        NaN     NaN      NaN
-sodalow        -2.75        NaN     NaN      NaN
-timeshort      25.25        NaN     NaN      NaN
-waterlow        1.75        NaN     NaN      NaN
-siftsift       -2.25        NaN     NaN      NaN
-butterlow       0.75        NaN     NaN      NaN
 ```
 
 
@@ -127,12 +144,6 @@ How do we get the p-values for the effect of the factors? For this example, the 
 lm.cookie.2vars = lm(yield ~ time + temp, data= cookie.data)
 
 summary(lm.cookie.2vars)
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)   60.625      1.588   38.18 2.32e-07 ***
-timeshort     25.250      1.834   13.77 3.63e-05 ***
-templow      -10.250      1.834   -5.59  0.00253 ** 
 ```
 
 
@@ -146,13 +157,6 @@ We can do a test for an interaction between time and temperature in their effect
 lm.cookie.2vars.interaction = lm(yield ~ time * temp, data= cookie.data)
 
 summary(lm.cookie.2vars.interaction)
-
-Coefficients:
-                  Estimate Std. Error t value Pr(>|t|)    
-(Intercept)         61.000      2.016  30.264  7.1e-06 ***
-timeshort           24.500      2.850   8.595  0.00101 ** 
-templow            -11.000      2.850  -3.859  0.01816 *  
-timeshort:templow    1.500      4.031   0.372  0.72869
 ```
 
 
@@ -173,43 +177,32 @@ For examples of how to do analyses of factorial designs and fractional factorial
 
 ```{r}
 # R code to create the cookie.data data set 
-
-mystring.levels="batch, flour, temp, soda, time, water, sift, butter, yield
-1,brown,low,low,long,high,sift,low,47
-2,white,low,low,short,low,sift,high,74
-3,brown,high,low,short,high,no,high,84
-4,white,high,low,long,low,no,low,62
-5,brown,low,high,long,low,no,high,53
-6,white,low,high,short,high,no,low,78
-7,brown,high,high,short,low,sift,low,87
-8,white,high,high,long,high,sift,high,60"
-
-cookie.data=read.table(textConnection(mystring.levels),header=TRUE,sep=",",row.names="batch")
 ```
 
 
 ```{r}
 # Turn the variables into factors to be able to use plot.design()
-cookie.data$flour = factor(cookie.data$flour)
-cookie.data$temp = factor(cookie.data$temp)
-cookie.data$soda = factor(cookie.data$soda)
-cookie.data$time = factor(cookie.data$time)
-cookie.data$water = factor(cookie.data$water)
-cookie.data$sift = factor(cookie.data$sift)
-cookie.data$butter = factor(cookie.data$butter)
 ```
 
+
+## R Code for This Chapter
 
 ```{r}
-cookie.data
-
-  flour temp soda  time water sift butter yield
-1 brown  low  low  long  high sift    low    47
-2 white  low  low short   low sift   high    74
-3 brown high  low short  high   no   high    84
-4 white high  low  long   low   no    low    62
-5 brown  low high  long   low   no   high    53
-6 white  low high short  high   no    low    78
-7 brown high high short   low sift    low    87
-8 white high high  long  high sift   high    60
+# R code to create the cookie.data data set
+cookie.data <- tibble::tribble(
+  ~batch, ~flour,   ~temp,  ~soda,  ~time,  ~water, ~sift,   ~butter, ~yield,
+       1, "brown",  "low",  "low",  "long",  "high", "sift",  "low",      47,
+       2, "white",  "low",  "low",  "short", "low",  "sift",  "high",     74,
+       3, "brown",  "high", "low",  "short", "high", "no",    "high",     84,
+       4, "white",  "high", "low",  "long",  "low",  "no",    "low",      62,
+       5, "brown",  "low",  "high", "long",  "low",  "no",    "high",     53,
+       6, "white",  "low",  "high", "short", "high", "no",    "low",      78,
+       7, "brown",  "high", "high", "short", "low",  "sift",  "low",      87,
+       8, "white",  "high", "high", "long",  "high", "sift",  "high",     60
+) |> dplyr::mutate(dplyr::across(where(is.character), as.factor))
 ```
+
+
+All datasets and analyses for this chapter.
+
+

@@ -1,5 +1,60 @@
 # When You Have Outliers and More Than One Explanatory Variable: Robust Tests
 
+```{r}
+#| include: false
+library(ggplot2)
+library(RobStatTM)
+
+cancer=c(83, 89, 90, 93, 98)
+controls=c(99, 100, 103, 104,  141)
+Mucin=c(cancer,controls)
+
+Diagnosis=c(rep("Cancer",5), rep("Controls",5))
+colon.data=data.frame(Diagnosis, Mucin)
+
+# install.packages("Rfit")
+library(Rfit)
+
+anova.2way.data <- tibble::tribble(
+~Treatment, ~Litter, ~Response,
+  "Drug", "Litter.1", 4,
+  "Drug", "Litter.1", 8,
+  "Drug", "Litter.2", 11,
+  "Drug", "Litter.2", 12,
+  "Drug", "Litter.3", 13,
+  "Drug", "Litter.3", 15,
+  "Drug", "Litter.4", 20,
+  "Drug", "Litter.4", 21,
+  "Placebo", "Litter.1", 10,
+  "Placebo", "Litter.1", 15,
+  "Placebo", "Litter.2", 16,
+  "Placebo", "Litter.2", 17,
+  "Placebo", "Litter.3", 19,
+  "Placebo", "Litter.3", 20,
+  "Placebo", "Litter.4", 21,
+  "Placebo", "Litter.4", 23
+)
+
+anova.2way.data.outlier <- tibble::tribble(
+~Treatment, ~Litter, ~Response,
+  "Drug", "Litter.1", 4,
+  "Drug", "Litter.1", 8,
+  "Drug", "Litter.2", 11,
+  "Drug", "Litter.2", 12,
+  "Drug", "Litter.3", 13,
+  "Drug", "Litter.3", 15,
+  "Drug", "Litter.4", 20,
+  "Drug", "Litter.4", 32,
+  "Placebo", "Litter.1", 10,
+  "Placebo", "Litter.1", 15,
+  "Placebo", "Litter.2", 16,
+  "Placebo", "Litter.2", 17,
+  "Placebo", "Litter.3", 19,
+  "Placebo", "Litter.3", 20,
+  "Placebo", "Litter.4", 21,
+  "Placebo", "Litter.4", 31
+)
+```
 
 The Wilcoxon and Kruskal-Wallis rank tests described in the previous chapter only allow for one explanatory variable. As we saw in chapter 1, you can get much better p-values by including more than one explanatory variable. This applies to analyses where you have outliers or non-normal data.
 
@@ -16,7 +71,7 @@ The essential idea of robust methods is to down weight the outliers so that they
 Robust methods are available in R, JMP, SAS, Stata, S-plus and other software. The R package RobStatTM presented here accompanies the textbook “Robust Statistics Theory and Methods (with R)” by Ricardo Maronna et al. (2018). It includes recent research advances not included in other software.
 
 
-## Example with one explanatory variable: Robust alternative to t-tests 
+## Example with one explanatory variable: Robust alternative to t-tests
 
 
 The Wilcoxon test is not the only alternative when you have outliers.
@@ -29,29 +84,17 @@ Use the install.packages function to install the RobStatTM package. You only nee
 
 
 ```{r}
-install.packages("RobStatTM")
+# install.packages("RobStatTM")
 ```
 
 
 Each time you start an R session, you need to load the library, using the command library(RobStatTM).
 
 
-```{r}
-library(RobStatTM)
-```
-
-
 We’ll use the colon data that we used in the previous chapter.
 
 
-```{r}
-cancer=c(83, 89, 90, 93, 98)
-controls=c(99, 100, 103, 104,  141)
-Mucin=c(cancer,controls)
-
-Diagnosis=c(rep("Cancer",5), rep("Controls",5))
-colon.data=data.frame(Diagnosis, Mucin)
-
+```{.r-output}
 colon.data
 ```
 
@@ -64,12 +107,11 @@ summary(with(colon.data, lmrobM(Mucin ~ Diagnosis)))
 ```
 
 
-```{r}
+```{.r-output}
 Coefficients:
                   Estimate Std. Error t value Pr(>|t|)    
 (Intercept)         90.607      1.999  45.336 6.19e-11 ***
 DiagnosisControls   10.893      2.993   3.639   0.0066 ** 
-
 ```
 
 
@@ -86,31 +128,11 @@ We have the following (synthetic) data for an experiment with mice, where treatm
 
 
 ```{r}
-anova.2way.data="Treatment,Litter,Response
-Drug,Litter.1,4
-Drug,Litter.1,8
-Drug,Litter.2,11
-Drug,Litter.2,12
-Drug,Litter.3,13
-Drug,Litter.3,15
-Drug,Litter.4,20
-Drug,Litter.4,21
-Placebo,Litter.1,10
-Placebo,Litter.1,15
-Placebo,Litter.2,16
-Placebo,Litter.2,17
-Placebo,Litter.3,19
-Placebo,Litter.3,20
-Placebo,Litter.4,21
-Placebo,Litter.4,23"
-
-anova.2way.data=read.table(textConnection(anova.2way.data), header=TRUE, sep=",")
+anova.2way.data
 ```
 
 
-```{r}
-anova.2way.data
-
+```{.r-output}
    Treatment   Litter Response
 1       Drug Litter.1        4
 2       Drug Litter.1        8
@@ -149,7 +171,7 @@ t.test(Response ~ Treatment, var.equal=TRUE, data = anova.2way.data)
 ```
 
 
-```{r}
+```{.r-output}
 Two Sample t-test
 
 data:  Response by Treatment
@@ -171,15 +193,14 @@ summary(lm (Response ~ Treatment, data = anova.2way.data))
 ```
 
 
-```
-
-```
-
-
-```{r}
+```{.r-output}
 Call:
-lm(formula = Response ~ Treatment, data = anova.2way.data)
 
+lm(formula = Response ~ Treatment, data = anova.2way.data)
+```
+
+
+```{.r-output}
 Residuals:
     Min      1Q  Median      3Q     Max 
 -9.0000 -2.1562 -0.3125  2.6250  8.0000 
@@ -203,7 +224,8 @@ However, the researcher thought that mice from different litters might have diff
 
 
 ```{r}
-ggplot(anova.2way.data, aes(y=Response, x=Treatment)) + geom_point() + facet_wrap(~Litter) + 
+ggplot(anova.2way.data, aes(y=Response, x=Treatment)) + geom_point() +
+  facet_wrap(~Litter) +
         ggtitle("Response to treatment  \nbroken out by Litter") + ylim(0,25)
 ```
 
@@ -217,7 +239,10 @@ Run a two-way ANOVA including both treatment and litter as explanatory variables
 ```{r}
 lm.2way = lm(Response ~ Litter + Treatment, data= anova.2way.data)
 anova(lm.2way)
+```
 
+
+```{.r-output}
 Response: Response
           Df  Sum Sq Mean Sq F value    Pr(>F)    
 Litter     3 303.187 101.062  27.323 2.135e-05 ***
@@ -233,31 +258,11 @@ Here is the modified data set. I’ve changed the highest values in litter 4 to 
 
 
 ```{r}
-anova.2way.data.outlier="Treatment,Litter,Response
-Drug,Litter.1,4
-Drug,Litter.1,8
-Drug,Litter.2,11
-Drug,Litter.2,12
-Drug,Litter.3,13
-Drug,Litter.3,15
-Drug,Litter.4,20
-Drug,Litter.4,32
-Placebo,Litter.1,10
-Placebo,Litter.1,15
-Placebo,Litter.2,16
-Placebo,Litter.2,17
-Placebo,Litter.3,19
-Placebo,Litter.3,20
-Placebo,Litter.4,21
-Placebo,Litter.4,31"
-
-anova.2way.data.outlier=read.table(textConnection(anova.2way.data.outlier), header=TRUE, sep=",")
+anova.2way.data.outlier
 ```
 
 
-```{r}
-anova.2way.data.outlier
-
+```{.r-output}
    Treatment   Litter Response
 1       Drug Litter.1        4
 2       Drug Litter.1        8
@@ -292,7 +297,10 @@ Here is the t-test for the data with the outliers, run first using the t.test fu
 
 ```{r}
 t.test(Response ~ Treatment, var.equal=TRUE, data = anova.2way.data.outlier)
+```
 
+
+```{.r-output}
 Two Sample t-test
 
 data:  Response by Treatment
@@ -308,10 +316,17 @@ sample estimates:
 
 ```{r}
 summary(lm (Response ~ Treatment, data = anova.2way.data.outlier))
+```
 
+
+```{.r-output}
 Call:
-lm(formula = Response ~ Treatment, data = anova.2way.data.outlier)
 
+lm(formula = Response ~ Treatment, data = anova.2way.data.outlier)
+```
+
+
+```{.r-output}
 Residuals:
     Min      1Q  Median      3Q     Max 
 -10.375  -3.438  -1.500   1.625  17.625 
@@ -333,9 +348,9 @@ The t-test and linear model both show that the drug effect is not significant, p
 
 
 ```{r}
-ggplot(anova.2way.data.outlier, aes(y=Response, x=Treatment)) + geom_point() + facet_wrap(~Litter) +  
+ggplot(anova.2way.data.outlier, aes(y=Response, x=Treatment)) + geom_point() +
+  facet_wrap(~Litter) +
 ggtitle("Response to treatment  \nbroken out by Litter, with outliers")
-
 ```
 
 
@@ -346,9 +361,13 @@ We’ll first try an ordinary two-way ANOVA for this data with outliers.
 
 
 ```{r}
-lm.2way.outlier = lm(Response ~ Litter + Treatment, data= anova.2way.data.outlier)
+lm.2way.outlier = lm(Response ~ Litter + Treatment,
+  data= anova.2way.data.outlier)
 anova(lm.2way.outlier)
+```
 
+
+```{.r-output}
 Analysis of Variance Table
 
 Response: Response
@@ -373,7 +392,7 @@ anova(lm(Response ~ Litter * Treatment, data= anova.2way.data.outlier))
 ```
 
 
-```{r}
+```{.r-output}
 Analysis of Variance Table
 
 Response: Response
@@ -397,30 +416,25 @@ Now we’ll do a robust analysis of the same data using the RobStatTM package.
 To run these examples, install and load the package with this code:
 
 
-```{r}
-install.packages("RobStatTM")
-library("RobStatTM")
-```
-
-
 Here is the analysis of the outlier data, with litter and treatment as the two explanatory variables. The function lmrobM() performs the robust regression analysis. (The two-way ANOVA can be implemented as a linear regression.)
 
 
 ```{r}
-anova.2way.data.outlier.lmrobM = lmrobM(Response ~ Litter + Treatment, data = anova.2way.data.outlier)
+anova.2way.data.outlier.lmrobM = lmrobM(Response ~ Litter + Treatment,
+  data = anova.2way.data.outlier)
 
 summary(anova.2way.data.outlier.lmrobM)
 ```
 
 
-```
-
-```
-
-
-```{r}
+```{.r-output}
 Call:
+
 lmrobM(formula = Response ~ Litter + Treatment, data = anova.2way.data.outlier)
+```
+
+
+```{.r-output}
 Residuals:
     Min      1Q  Median      3Q     Max 
 -2.7439 -0.6934  0.5000  1.4406 13.9942 
@@ -448,12 +462,13 @@ We can also examine the results for the robust analysis for the data with no out
 
 
 ```{r}
-anova.2way.data.lmrobM = lmrobM(Response ~ Litter + Treatment, data = anova.2way.data) # control=cont)
+anova.2way.data.lmrobM = lmrobM(Response ~ Litter + Treatment,
+  data = anova.2way.data) # control=cont)
 summary(anova.2way.data.lmrobM)
 ```
 
 
-```{r}
+```{.r-output}
 Coefficients:
                  Estimate Std. Error t value Pr(>|t|)    
 (Intercept)        6.9258     1.0767   6.433 4.86e-05 ***
@@ -476,20 +491,18 @@ Rank-based methods convert the data to rank-based scores. We’ll do a rank-base
 To run these examples, install and load the package with this code:
 
 
-```{r}
-install.packages("Rfit")
-library(Rfit)
-```
-
-
 Here is the analysis of the outlier data, with litter and treatment as the two explanatory variables. The function rfit() performs the analysis.
 
 
 ```{r}
-anova.2way.data.outlier.rfit = with(anova.2way.data.outlier, rfit(Response ~ Litter + Treatment))
+anova.2way.data.outlier.rfit = with(anova.2way.data.outlier,
+  rfit(Response ~ Litter + Treatment))
 
 summary(anova.2way.data.outlier.rfit)
+```
 
+
+```{.r-output}
 Coefficients:
                  Estimate Std. Error t.value   p.value    
 (Intercept)        7.2500     2.0287  3.5737  0.004366 ** 
@@ -514,7 +527,10 @@ We could have started the analysis with an interaction test, using the Rfit func
 
 ```{r}
 with(anova.2way.data.outlier, raov(Response ~ Litter * Treatment))
+```
 
+
+```{.r-output}
 Robust anova Table
                  DF       RD  Mean RD       F p-value
 Litter            3 55.90170 18.63390 6.69423 0.01423
@@ -534,7 +550,7 @@ summary(rfit(Response ~ Litter + Treatment, data = anova.2way.data))
 ```
 
 
-```{r}
+```{.r-output}
 Coefficients:
                  Estimate Std. Error t.value   p.value    
 (Intercept)        7.2500     1.4574  4.9746  0.000419 ***
@@ -579,3 +595,6 @@ John Kloke and Joseph W. McKean (2015). Nonparametric Statistical Methods Using 
 
 
 Rand R. Wilcox (2022). Introduction to Robust Estimation and Hypothesis Testing (Statistical Modeling and Decision Science) 5th Edition. Academic Press.
+
+
+

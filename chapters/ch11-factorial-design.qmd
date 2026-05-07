@@ -1,5 +1,28 @@
 # Avoid One-Variable-at-a-Time Experiments: Use Factorial Experiment Design
 
+```{r}
+#| include: false
+yield.data <- tibble::tribble(
+  ~temperature, ~salt.conc, ~buffer.type, ~yield,
+  "Low",  "Low",  "A",  7.88,
+  "Low",  "High", "A",  6.54,
+  "High", "Low",  "A", 16.12,
+  "High", "High", "A", 11.14,
+  "Low",  "Low",  "B",  9.26,
+  "Low",  "High", "B", 10.43,
+  "High", "Low",  "B", 13.92,
+  "High", "High", "B",  8.47,
+  "Low",  "Low",  "A",  7.63,
+  "Low",  "High", "A",  6.11,
+  "High", "Low",  "A", 15.45,
+  "High", "High", "A", 11.72,
+  "Low",  "Low",  "B",  9.8,
+  "Low",  "High", "B",  7.22,
+  "High", "Low",  "B", 11.89,
+  "High", "High", "B", 14.57
+) |> dplyr::mutate(dplyr::across(where(is.character), as.factor))
+```
+
 
 You have likely heard the advice, “Hold everything constant, change one thing at a time”. This is the one-variable-at-a-time (OVAT) approach.
 
@@ -113,9 +136,6 @@ I recommend you get a copy of Box’s book "Improving Almost Anything". You will
 Now let’s apply these concepts to a typical biology experiment.
 
 
-## 
-
-
 ## Example:  experiment design for 3 factors
 
 
@@ -188,34 +208,11 @@ When we want a p-value, we use analysis of variance or multiple regression to te
 Suppose we have the following data for the salt, buffer, and temperature example, including the yield.
 
 
-```{r}
-yield.data
-
-   temperature salt.conc buffer.type yield
-1          Low       Low           A  7.88
-2          Low      High           A  6.54
-3         High       Low           A 16.12
-4         High      High           A 11.14
-5          Low       Low           B  9.26
-6          Low      High           B 10.43
-7         High       Low           B 13.92
-8         High      High           B  8.47
-9          Low       Low           A  7.63
-10         Low      High           A  6.11
-11        High       Low           A 15.45
-12        High      High           A 11.72
-13         Low       Low           B  9.80
-14         Low      High           B  7.22
-15        High       Low           B 11.89
-16        High      High           B 14.57
-```
-
-
 The R function plot.design provides a quick display of the mean yield for each treatment level.
 
-
 ```{r}
-plot.design(yield ~ buffer.type + temperature + salt.conc,  data = yield.data, ylim=c(7,14))
+plot.design(yield ~ buffer.type + temperature + salt.conc,
+  data=yield.data, ylim=c(7,14))
 ```
 
 
@@ -229,13 +226,14 @@ Here is the regression analysis and the output.
 
 
 ```{r}
-yield.data.lm=lm(yield ~ buffer.type + temperature + salt.conc , data=yield.data)
+yield.data.lm=lm(yield ~ buffer.type + temperature + salt.conc ,
+  data=yield.data)
 
 summary(yield.data.lm)
 ```
 
 
-```{r}
+```{.r-output}
 Coefficients:
                Estimate Std. Error t value Pr(>|t|)    
 (Intercept)     11.7400     0.9883  11.879 5.41e-08 ***
@@ -275,51 +273,22 @@ Free textbook PDF:
 A free PDF of the text "A First Course in Design and Analysis of Experiments" by Gary Oehlert is available at this website http://users.stat.umn.edu/~gary/Book.html
 
 
-## R code for the yield data.
-
-
-```{r}
-yield.data="temperature,salt.conc,buffer.type,yield
-Low,Low,A,7.88
-Low,High,A,6.54
-High,Low,A,16.12
-High,High,A,11.14
-Low,Low,B,9.26
-Low,High,B,10.43
-High,Low,B,13.92
-High,High,B,8.47
-Low,Low,A,7.63
-Low,High,A,6.11
-High,Low,A,15.45
-High,High,A,11.72
-Low,Low,B,9.8
-Low,High,B,7.22
-High,Low,B,11.89
-High,High,B,14.57"
-
-yield.data=read.table(textConnection(yield.data), header=TRUE, sep=",")
-```
+## R Code for This Chapter
 
 
 ```{r}
 # Turn the variables into factors to be able to use plot.design()
-
-yield.data$temperature = factor(yield.data$temperature)
-yield.data$salt.conc = factor(yield.data$salt.conc)
-yield.data$buffer.type = factor(yield.data$buffer.type)
-```
-
-
-```{r}
-# Graph the results using plot.design. Note than, in plot.design, the response variable is numeric, and the explanatory factors are text (e.g., “low” and “high”.
-
-plot.design(yield ~ buffer.type + temperature + salt.conc, data = yield.data, ylim=c(7,14))
 ```
 
 
 ```{r}
 # Regression analysis
 
-yield.data.lm=lm(yield ~ buffer.type + temperature + salt.conc , data=yield.data)
+yield.data.lm=lm(yield ~ buffer.type + temperature + salt.conc ,
+  data=yield.data)
 summary(yield.data.lm)
 ```
+
+
+
+

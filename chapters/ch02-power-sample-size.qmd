@@ -1,5 +1,16 @@
 # Calculate Power and Sample Size if You Want p < 0.05
 
+```{r}
+#| include: false
+group1=c(1.1, 2.3, 4.8, 5.4, 7.9)
+group2=c(3.3, 4.2, 4.7, 7.6, 9.2)
+```
+
+```{r}
+mean(group2)-mean(group1)
+sd(group1)
+sd(group2)
+```
 
 Before you begin an experiment, would you like to know your chances of getting p < 0.05? 
 
@@ -22,7 +33,9 @@ It can be difficult to get the necessary information to calculate power for an a
 Let’s look at a few scenarios to get an intuitive idea of what affects power and sample size.
 
 
-Scenario 1: A good situation. 
+
+### Scenario 1: A good situation
+ 
 
 
 We have Group A with mean 8 and Group B with mean 12. The difference between the means is delta = 12 – 8 = 4. The variability within each group is described by the standard deviation, which is sd = 2 for these data.
@@ -43,16 +56,25 @@ Assumptions:
 
 ```{r}
 power.t.test(delta = 4, sd = 2, sig.level = 0.05, power = 0.8)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 5.090008
           delta = 4
              sd = 2
       sig.level = 0.05
           power = 0.8
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -60,7 +82,9 @@ NOTE: n is number in *each* group
 In the output from power.t.test, the words “Two-sample” indicate the two groups. So, the output indicates that, for the given assumptions, the required sample size is n = 5.09 per group. Rounding up to 6 per group, we need a total sample size of 2*6=12. 
 
 
-Scenario 2: An OK situation.
+
+### Scenario 2: An OK situation
+
 
 
 The variability within each group is the same as scenario 1, but the difference between the two group means is smaller.
@@ -81,16 +105,25 @@ Assumptions:
 
 ```{r}
 power.t.test(delta = 2, sd = 2, sig.level = 0.05, power = 0.8)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 16.71477
           delta = 2
              sd = 2
       sig.level = 0.05
           power = 0.8
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -101,7 +134,9 @@ The output from power.t.test indicates that, for the given assumptions, the requ
 Because the difference between the means is smaller, the sample size is larger than in scenario 1.
 
 
-Scenario 3: An unfavorable situation.
+
+### Scenario 3: An unfavorable situation
+
 
 
 The group means are close together. The variability within each group is large.
@@ -125,16 +160,25 @@ Assumptions:
 
 ```{r}
 power.t.test(delta = 2, sd = 3, sig.level = 0.05, power = 0.8)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 36.3058
           delta = 2
              sd = 3
       sig.level = 0.05
           power = 0.8
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -163,16 +207,25 @@ Assumptions:
 
 ```{r}
 power.t.test(delta = 6, sd = 4, sig.level = 0.05, n=25)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 25
           delta = 6
              sd = 4
       sig.level = 0.05
           power = 0.9993912
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -182,16 +235,25 @@ The output from power.t.test indicates that, for the given assumptions, a sample
 
 ```{r}
 power.t.test(delta = 6, sd = 4, sig.level = 0.05, power = 0.95)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 12.59872
           delta = 6
              sd = 4
       sig.level = 0.05
           power = 0.95
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -233,16 +295,6 @@ The free R package TrialSize accompanies the textbook "Sample Size Calculation i
 Here are a few examples using the base R functions for power and sample size calculations.
 
 
-```{r}
-help(power.t.test)
-
-power.t.test(n = NULL, delta = NULL, sd = 1, sig.level = 0.05, power = NULL, type = c("two.sample", "one.sample", "paired"),alternative = c("two.sided", "one.sided"), strict = FALSE)
-
-       n: Number of observations (per group)
-   delta: True difference in means
-      sd: Standard deviation
-```
-
 
 Sample size for a two-sample t-test.
 
@@ -253,16 +305,25 @@ Sample size for a two-sample t-test.
 
 ```{r}
 power.t.test(delta = 0.5, sd = 0.5, sig.level = 0.01, power = 0.9)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 31.46245
           delta = 0.5
              sd = 0.5
       sig.level = 0.01
           power = 0.9
     alternative = two.sided
+```
 
+
+```{.r-output}
  NOTE: n is number in *each* group
 ```
 
@@ -276,16 +337,25 @@ Estimate power for a two-sample t-test.
 
 ```{r}
 power.t.test(delta = 0.5, sd = 0.5, sig.level = 0.01, n = 31)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 31
           delta = 0.5
              sd = 0.5
       sig.level = 0.01
           power = 0.8946133
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -293,18 +363,22 @@ NOTE: n is number in *each* group
 You can give several values for the sample size n.
 
 
-```{r}
-power.t.test(delta = 0.5, sd = 0.5, sig.level = 0.01,  n=c(20, 30, 40, 50, 100))
-
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 20, 30, 40, 50, 100
           delta = 0.5
              sd = 0.5
       sig.level = 0.01
           power = 0.6728849, 0.8820913, 0.9640944, 0.9903248, 0.9999954
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -315,14 +389,7 @@ NOTE: n is number in *each* group
 Suppose you plan an experiment, and want to estimate sample size. You don't have information on mean effect size or standard deviation. You perform a pilot study to collect information on the mean and standard deviation of two groups, and get the following results.
 
 
-```{r}
-group1=c(1.1, 2.3, 4.8, 5.4, 7.9)
-group2=c(3.3, 4.2, 4.7, 7.6, 9.2)
-
-mean(group2)-mean(group1)
-sd(group1)
-sd(group2)
-
+```{.r-output}
 > mean(group2)-mean(group1)
 [1] 1.5
 > sd(group1)
@@ -337,16 +404,25 @@ The estimated effect size is the difference between the means, which is 1.5. The
 
 ```{r}
 power.t.test(delta = 1.5, sd = 2.7, sig.level = 0.05, power=0.8)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 51.83884
           delta = 1.5
              sd = 2.7
       sig.level = 0.05
           power = 0.8
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -362,16 +438,25 @@ Suppose you plan an experiment using a 96 well plate. You run identical specimen
 
 ```{r}
 power.t.test(delta=5, sd=10, sig.level = 0.05, power=0.8)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 63.76576
           delta = 5
              sd = 10
       sig.level = 0.05
           power = 0.8
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -381,16 +466,25 @@ You think that by fixing the assay, you may be able to  reduce the standard devi
 
 ```{r}
 power.t.test(delta=5, sd=5, sig.level = 0.05, power=0.8)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 16.71477
           delta = 5
              sd = 5
       sig.level = 0.05
           power = 0.8
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 

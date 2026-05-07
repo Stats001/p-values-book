@@ -1,5 +1,35 @@
 # When You Have Outliers or Non-Normal Distributions: Wilcoxon and Kruskal-Wallis Rank Tests
 
+```{r}
+#| include: false
+ranked.data  = data.frame(extra = sort(sleep$extra),
+  ranked.extra = rank(sort(sleep$extra)))
+
+cancer=c(83, 89, 90, 93, 98)
+controls=c(99, 100, 103, 104,  141)
+Mucin=c(cancer,controls)
+
+Diagnosis=c(rep("Cancer",5), rep("Controls",5))
+colon.data=data.frame(Diagnosis, Mucin)
+
+bears.winter=c(300,470,550,760,800,955,1260,1290)
+bears.spring=c(280,445,520,715,750,890,990,900)
+Weight=c(bears.winter, bears.spring)
+Season=c(rep("Winter",8), rep("Spring",8))
+bear.data=data.frame(Season,Weight)
+
+# install.packages("Rfit") # if not already installed
+library(Rfit)
+
+quail.oneway.rfit = with(quail, oneway.rfit(ldl, treat))
+
+
+Group.A=c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1)
+
+Group.B=c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0, 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2)
+```
 
 If you have outliers in your data, or the data within each treatment group are not normally distributed, t-tests are more likely to give non-significant p-values. Outliers and non-normal distributions reduce the power of t-tests to detect significant effects. Even when graphs of your data show that there is a difference among the groups, you may get non-significant p-values from t-tests as a result of the outliers or non-normal distributions.
 
@@ -16,14 +46,12 @@ If your sample size is large, deviations from normal distribution may be less of
 As an example of what we mean by ranks, here are observations from the sleep data frame from R with the original values of the variable extra and the values of extra converted to ranks. You can use the help(sleep) command to read a description of the data set.
 
 
-```{r}
-ranked.data  = data.frame(extra = sort(sleep$extra), ranked.extra = rank(sort(sleep$extra)))
-
+```{.r-output}
 ranked.data
 ```
 
 
-```{r}
+```{.r-output}
    extra ranked.extra
 1   -1.6          1.0
 2   -1.2          2.0
@@ -48,7 +76,7 @@ ranked.data
 ```
 
 
-## Alternative to two-sample t-test: Wilcoxon rank sum for two independent samples 
+## Alternative to two-sample t-test: Wilcoxon rank sum for two independent samples
 
 
 Let’s start with an example where we use a t-test for the question, do colon cancer patients have elevated levels of the mucin protein in their blood?  In this synthetic data, we have the level of the protein mucin in two groups: (1) patients with colon cancer and (2) healthy controls. The two-sample t-test is commonly used for such data.
@@ -57,19 +85,12 @@ Let’s start with an example where we use a t-test for the question, do colon c
 Here is R code with the data and a graph. 
 
 
-```{r}
-cancer=c(83, 89, 90, 93, 98)
-controls=c(99, 100, 103, 104,  141)
-Mucin=c(cancer,controls)
-
-Diagnosis=c(rep("Cancer",5), rep("Controls",5))
-colon.data=data.frame(Diagnosis, Mucin)
-
+```{.r-output}
 colon.data
 ```
 
 
-```{r}
+```{.r-output}
    Diagnosis Mucin
 1     Cancer    83
 2     Cancer    89
@@ -97,13 +118,22 @@ Here are the means and medians of the two groups. Notice that the mean of the co
 
 ```{r}
 aggregate(Mucin ~ Diagnosis, colon.data, mean)
+```
 
+
+```{.r-output}
   Diagnosis Mucin
 1    Cancer  90.6
 2  Controls 109.4
+```
 
+
+```{r}
 aggregate(Mucin ~ Diagnosis, colon.data, median)
-  
+```
+
+
+```{.r-output}
 Diagnosis Mucin
 1    Cancer    90
 2  Controls   103
@@ -115,7 +145,10 @@ Here is the ordinary two-sample t-test, using the R function t.test.
 
 ```{r}
 with(colon.data, t.test(Mucin ~ Diagnosis, var.equal=TRUE))
+```
 
+
+```{.r-output}
         Two Sample t-test
 
 data:  Mucin by Diagnosis
@@ -143,7 +176,10 @@ Here is the Wilcoxon test using the R function wilcox.test.
 
 ```{r}
 with(colon.data, wilcox.test(Mucin ~ Diagnosis, conf.int=TRUE))
+```
 
+
+```{.r-output}
 Wilcoxon rank sum test
 
 data:  Mucin by Diagnosis
@@ -174,16 +210,25 @@ What sample size would we need if we wanted to get a significant p-value for the
 
 ```{r}
 power.t.test(delta = 18.8, sd = 17.8, sig.level = 0.05, power = 0.8)
+```
 
+
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 15.09557
           delta = 18.8
              sd = 17.8
       sig.level = 0.05
           power = 0.8
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -200,13 +245,7 @@ The paired t-test is often used to test for difference in paired (matched) sampl
 Suppose we would like to know if bears lose weight between winter and spring, while they are hibernating. We collect the following data.
 
 
-```{r}
-bears.winter=c(300,470,550,760,800,955,1260,1290)
-bears.spring=c(280,445,520,715,750,890,990,900)
-Weight=c(bears.winter, bears.spring)
-Season=c(rep("Winter",8), rep("Spring",8))
-bear.data=data.frame(Season,Weight)
-
+```{.r-output}
 bear.data
 
 Season Weight
@@ -241,8 +280,11 @@ We’ll first use the paired t-test to examine the change in weight of bears, wh
 
 
 ```{r}
-with(bear.data, t.test(Weight ~ Season, paired=TRUE))
+t.test(bears.winter, bears.spring, paired=TRUE)
+```
 
+
+```{.r-output}
 Paired t-test
 
 data:  Weight by Season
@@ -260,8 +302,11 @@ The paired t-test gives p = 0.057, indicating that bears do not lose weight whil
 
 
 ```{r}
-with(bear.data, wilcox.test(Weight ~ Season, paired=TRUE))
+wilcox.test(bears.winter, bears.spring, paired=TRUE)
+```
 
+
+```{.r-output}
 Wilcoxon signed rank test
 
 data:  Weight by Season
@@ -286,14 +331,11 @@ We’ll use the quail data set from the Rfit package. Thirty-nine quail were ran
 
 
 ```{r}
-install.packages("Rfit") # if not already installed
-library(Rfit)
+head(quail, 10) # display the first 10 rows of the quail data set
 ```
 
 
-```{r}
-head(quail, 10) # display the first 10 rows of the quail data set
-
+```{.r-output}
    treat ldl
 1      1  52
 2      1  67
@@ -305,21 +347,6 @@ head(quail, 10) # display the first 10 rows of the quail data set
 8      1  47
 9      1 120
 10     1  73
-```
-
-
-```
-
-```
-
-
-```
-
-```
-
-
-```
-
 ```
 
 
@@ -336,7 +363,10 @@ Here are the median values for each treatment.
 
 ```{r}
 aggregate(ldl~treat, quail, median)
+```
 
+
+```{.r-output}
   treat  ldl
 1     1 68.5
 2     2 35.0
@@ -351,7 +381,10 @@ We’ll begin with a standard one-way analysis of variance.
 ```{r}
 quail.lm.fit = with(quail, lm(ldl ~ treat))
 anova(quail.lm.fit)
+```
 
+
+```{.r-output}
 Analysis of Variance Table
 
 Response: ldl
@@ -369,6 +402,10 @@ Next try the Kruskal-Wallis test.
 
 ```{r}
 with(quail, kruskal.test(ldl, treat))
+```
+
+
+```{.r-output}
 Kruskal-Wallis rank sum test
 
 data:  ldl and treat
@@ -382,17 +419,16 @@ The Kruskal-Wallis test approaches significance, with p = 0.066.
 Alternatively, we can use the function oneway.rfit, from the Rfit package, to perform a rank-based analysis of the quail data. 
 
 
-```{r}
-quail.oneway.rfit = with(quail, oneway.rfit(ldl, treat))
-quail.oneway.rfit
-```
-
 
 The oneway.rfit function indicates that there is a significant difference among the quail treatment groups p = 0.016394. The oneway.rfit output also shows pairwise comparisons that test for differences among the 4 treatment groups. By default, there is no p-value adjustment for multiple hypothesis testing. We can request estimates of the differences between each pair of treatments with confidence intervals adjusted for multiple comparisons by specifying method = ”tukey”.
 
 
 ```{r}
 summary(quail.oneway.rfit, method="tukey")
+```
+
+
+```{.r-output}
 Multiple Comparisons
 Method Used  tukey 
 
@@ -418,13 +454,6 @@ If the treatment groups do not differ in shape, but differ only by a shift in th
 You can construct two treatment groups that have identical medians, but that differ in their rank sums, and will give significant differences in the Wilcoxon or Kruskal-Wallis tests.
 
 
-```{r}
-Group.A=c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1)
-
-Group.B=c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2)
-```
-
-
 The medians of the groups are both zero but the standard deviations (shape) are different.
 
 
@@ -433,13 +462,16 @@ median(Group.A) # 0
 median(Group.B) # 0
 
 sd(Group.A) # 0.5
-sd(Group.B.B) # 1.0
+sd(Group.B) # 1.0
 ```
 
 
 ```{r}
 wilcox.test(Group.A, Group.B)
+```
 
+
+```{.r-output}
 Wilcoxon rank sum test with continuity correction
 
 data:  group.A and group.B

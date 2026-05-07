@@ -12,12 +12,11 @@ If you have no experience with statistics, I suggest that you start with the com
 
 ## R packages used in the book
 
+Install these once before rendering the book:
+
 ```r
-install.packages("ggplot2")
-install.packages("Rfit")
-install.packages("RobStatTM")
-install.packages("car")
-install.packages("vcdExtra")
+install.packages(c("ggplot2", "Rfit", "RobStatTM", "car",
+                   "vcdExtra", "tibble", "dplyr"))
 ```
 
 ## YouTube videos based on the book

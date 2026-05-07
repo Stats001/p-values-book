@@ -37,17 +37,25 @@ Here is the estimated sample size using the R function power.t.test.
 
 ```{r}
 power.t.test(delta=1, power = 0.8, sd = 2, sig.level  = 0.05)
+```
 
 
+```{.r-output}
      Two-sample t test power calculation 
+```
 
+
+```{.r-output}
               n = 63.76576
           delta = 1
              sd = 2
       sig.level = 0.05
           power = 0.8
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 
@@ -73,15 +81,25 @@ Here is the estimated power using the R function power.t.test, with sample size 
 
 ```{r}
 power.t.test(n = 64, delta=1, sd = 2, sig.level  = 0.025)
-     Two-sample t test power calculation 
+```
 
+
+```{.r-output}
+     Two-sample t test power calculation 
+```
+
+
+```{.r-output}
               n = 64
           delta = 1
              sd = 2
       sig.level = 0.025
           power = 0.7118426
     alternative = two.sided
+```
 
+
+```{.r-output}
 NOTE: n is number in *each* group
 ```
 

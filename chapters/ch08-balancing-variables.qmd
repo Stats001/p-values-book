@@ -1,5 +1,44 @@
 # Balancing Variables Across Treatment Groups Is Not Sufficient to Get Best P-Values
 
+```{r}
+#| include: false
+library(ggplot2)
+library(car)
+# Serum protein vs Age and Treatment
+# Generate a data set "experiment.2.data"
+
+protein.data <- tibble::tribble(
+  ~Subject, ~Age, ~Treatment,   ~Serum.protein,
+         1,   40, "Placebo",               63,
+         2,   40, "Drug",                  57,
+         3,   50, "Placebo",               75,
+         4,   50, "Drug",                  65,
+         5,   60, "Placebo",               82,
+         6,   60, "Drug",                  78,
+         7,   70, "Placebo",               94,
+         8,   70, "Drug",                  86
+)
+
+
+
+protein.lm = lm(Serum.protein ~ Treatment + Age, data=protein.data)
+
+graph.1 = ggplot(protein.data, aes(y=Serum.protein, x=Age, color=Treatment)) +
+  geom_point(size=3) +
+  ggtitle("Serum protein vs Age and Treatment") +
+  ylim(50, 100)
+
+
+set.seed(100) # set.seed makes rnorm reproducible.
+
+Treatment = c(rep(0, 8), rep(1, 8))
+Instrument = c(rep(c(0, 1),8))
+Operator = c(rep(c(0, 0, 1, 1),4))
+Response =  20 + Treatment + Instrument + Operator + rnorm(n=16)
+experiment.2.data = data.frame(Treatment = Treatment, Instrument =Instrument,
+  Operator = Operator , Response= Response)
+
+```
 
 You may have been given this advice by a well-intentioned collaborator: 
 
@@ -40,7 +79,10 @@ Next, analyze the data using a multiple regression model that includes both trea
 protein.lm = lm(Serum.protein ~ Treatment + Age, data=protein.data)
 
 summary(protein.lm)
+```
 
+
+```{.r-output}
 Coefficients:
                  Estimate Std. Error t value Pr(>|t|)    
 (Intercept)      23.50000    2.55930   9.182 0.000257 ***
@@ -75,7 +117,7 @@ We perform an experiment to test the effect of a treatment on a response. Unfort
 Here is the experiment.2.data. Notice that the two Instruments are perfectly balanced across the Treatment groups. The two Operators are also perfectly balanced across the Treatment groups.
 
 
-```{r}
+```{.r-output}
    Treatment Instrument Operator Response
 1          0          0        0 19.49781
 2          0          1        0 21.13153
@@ -111,7 +153,8 @@ Next, we’ll analyze the data using a multiple regression model that includes t
 
 
 ```{r}
-with(experiment.2.data, summary(lm(Response ~ Treatment + Instrument + Operator)))
+with(experiment.2.data,
+  summary(lm(Response ~ Treatment + Instrument + Operator)))
 ```
 
 
@@ -135,34 +178,8 @@ If you want ways to quickly and efficiently identify nuisance variables that are
 We wish to know if a drug affects a serum protein. The serum protein is known to change with age. We have the following data.
 
 
-```{r}
-protein.data = data.frame(Subject = 1:8,                          Age = c(40, 40, 50, 50, 60, 60, 70, 70),
-Treatment = c(rep(c("Drug", "Placebo"),4)),
-Serum.protein = c(63, 57, 75, 65, 82, 78, 94, 86))
-```
-
-
-```{r}
+```{.r-output}
 protein.data
-```
-
-
-```{r}
-  Subject Age Treatment Serum.protein
-1       1  40   Placebo            63
-2       2  40      Drug            57
-3       3  50   Placebo            75
-4       4  50      Drug            65
-5       5  60   Placebo            82
-6       6  60      Drug            78
-7       7  70   Placebo            94
-8       8  70      Drug            86
-```
-
-
-```{r}
-library(ggplot2)
-library(car) 
 ```
 
 
@@ -174,7 +191,8 @@ Plot the data.
 
 ```{r}
 ggplot(protein.data, aes(y=Serum.protein, x=Treatment)) +  geom_point() +  
-  ggtitle("Serum protein vs Treatment") + ylim(30,80) + geom_point(aes(color=Treatment))
+ggtitle("Serum protein vs Treatment") + ylim(50, 100) +
+  geom_point(aes(color=Treatment))
 ```
 
 
@@ -183,17 +201,6 @@ Perform a t-test.
 
 ```{r}
 t.test(Serum.protein ~ Treatment, data=protein.data, var.equal=TRUE)
-
-Two Sample t-test
-
-data:  Serum.protein by Treatment
-t = -0.76301, df = 6, p-value = 0.4744
-alternative hypothesis: true difference in means is not equal to 0
-95 percent confidence interval:
- -29.44855  15.44855
-sample estimates:
-   mean in group Drug mean in group Placebo 
-                 71.5                  78.5 
 ```
 
 
@@ -204,11 +211,6 @@ However, if we plot serum protein values by age, we see an important pattern. He
 
 
 ```{r}
-# Serum protein vs Age and Treatment
-graph.1 = ggplot(protein.data, aes(y=Serum.protein, x= Age)) + geom_point(aes(color=Treatment, shape=Treatment), size=4) + 
-  xlim(30,80) + ylim(50, 100)  +  
-  ggtitle("Serum protein vs Age and Treatment")
-
 graph.1
 ```
 
@@ -216,19 +218,13 @@ graph.1
 The plot indicates that, within each age group, the drug is having an effect. But the t-test cannot detect that effect, because of the additional variance caused by age.
 
 
-Multiple regression model including both Age and Treatment
+**Multiple regression model including both Age and Treatment**
 
 
 The better method is to include both age and treatment as explanatory variables in the analysis, using either ANOVA or linear regression. Doing so removes the otherwise unexplained variability caused by age. Here is the result using lm and the Anova() function from library(car). 
 
 
-```{r}
-protein.lm = lm(Serum.protein ~ Treatment + Age, data=protein.data)
-
-Anova(protein.lm)
-
-
-
+```{.r-output}
 Anova Table (Type II tests)
 
 Response: Serum.protein
@@ -255,19 +251,8 @@ We have 4 variables in the data:
 - Operator, a nuisance variable that also affects the response.
 - Instrument, a nuisance variable that also affects the response.
 
-```{r}
-# Generate a data set "experiment.2.data"
-set.seed(100) # Use set.seed to make the randomly generated data from the rnorm function  reproducible.
 
-Treatment = c(rep(0, 8), rep(1, 8))
-Instrument = c(rep(c(0, 1),8))
-Operator = c(rep(c(0, 0, 1, 1),4))
-Response =  20 + Treatment + Instrument + Operator + rnorm(n=16)
-experiment.2.data = data.frame(Treatment = Treatment, Instrument =Instrument, Operator = Operator , Response= Response)
-```
-
-
-```{r}
+```{.r-output}
 experiment.2.data
 
    Treatment Instrument Operator Response
@@ -316,17 +301,6 @@ First, we’ll try a t-test of Response ~ Treatment with no adjustment for Instr
 
 ```{r}
 with(experiment.2.data, t.test(Response ~ Treatment, var.equal=TRUE))
-
-Two Sample t-test
-
-data:  Response by Treatment
-t = -1.483, df = 14, p-value = 0.1602
-alternative hypothesis: true difference in means is not equal to 0
-95 percent confidence interval:
- -2.026618  0.369678
-sample estimates:
-mean in group 0 mean in group 1 
-       21.12569        21.95416
 ```
 
 
@@ -337,18 +311,8 @@ Next, let’s do a multiple regression model including Response ~ Treatment + In
 
 
 ```{r}
-with(experiment.2.data, summary(lm(Response ~ Treatment + Instrument + Operator)))
-
-Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  19.7406     0.2003  98.574  < 2e-16 ***
-Treatment     0.8285     0.2003   4.137  0.00138 ** 
-Instrument    1.5447     0.2003   7.714 5.45e-06 ***
-Operator      1.2254     0.2003   6.119 5.19e-05 ***
-
-Residual standard error: 0.4005 on 12 degrees of freedom
-Multiple R-squared:  0.9048,Adjusted R-squared:  0.881 
-F-statistic: 38.02 on 3 and 12 DF,  p-value: 2.092e-06
+with(experiment.2.data,
+  summary(lm(Response ~ Treatment + Instrument + Operator)))
 ```
 
 
@@ -359,3 +323,5 @@ Which do you prefer?
 
 - T-test p = 0.16, ignoring other variables.
 - Regression p = 0.00138, controlling for other variables.
+
+

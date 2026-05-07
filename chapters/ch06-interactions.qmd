@@ -1,5 +1,53 @@
 # Look (Out) for Interactions: When Subgroups Respond Differently to Treatment
 
+```{r}
+#| include: false
+library(ggplot2)
+
+CR.data = data.frame(
+  CR = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes",
+         "No", "No", "No", "No", "No", "No", "No", "No"),
+  Learning.score = c(65, 68, 72, 60, 69, 71, 62, 70,
+                     64, 67, 62, 61, 68, 63, 64, 65))
+
+CR.Age.data = data.frame(
+  CR = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes",
+         "No", "No", "No", "No", "No", "No", "No", "No"),
+  Learning.score = c(65, 68, 72, 60, 69, 71, 62, 70,
+                     64, 67, 62, 61, 68, 63, 64, 65),
+  Age = c("Young", "Old", "Old", "Young", "Old", "Old", "Young", "Old",
+          "Young", "Young", "Old", "Young", "Old", "Old", "Old", "Old"))
+
+young.mouse.data = subset(CR.Age.data, Age=="Young")
+old.mouse.data   = subset(CR.Age.data, Age=="Old")
+
+mouse.lm.CR       = lm(Learning.score ~ CR, data=CR.data)
+mouse.lm.CR.Age   = with(CR.Age.data, lm(Learning.score ~ CR + Age))
+mouse.lm.CR.Age.interaction = with(CR.Age.data, lm(Learning.score ~ CR * Age))
+young.mouse.lm    = lm(Learning.score ~ CR, data=young.mouse.data)
+old.mouse.lm      = lm(Learning.score ~ CR, data=old.mouse.data)
+
+mouse.CR.graph = ggplot(CR.data, aes(y=Learning.score, x=CR)) +
+  geom_point() + ggtitle("Mouse CR data") +
+  scale_y_continuous(breaks=0:80*10, limits=c(50, 80))
+
+mouse.interaction.graph = ggplot(CR.Age.data,
+  aes(y=Learning.score, x=CR, group=Age, col=Age, shape=Age)) +
+  geom_point() +
+  ggtitle("Interaction of CR with Age \nin their effect on Learning score") +
+  scale_y_continuous(breaks=0:80*10, limits=c(50, 80))
+
+young.mouse.CR.graph = ggplot(young.mouse.data, aes(y=Learning.score, x=CR)) +
+  geom_point() +
+  ggtitle("Young mouse CR data") +
+  scale_y_continuous(breaks=0:80*10, limits=c(50, 80))
+
+old.mouse.CR.graph = ggplot(old.mouse.data, aes(y=Learning.score, x=CR)) +
+  geom_point() +
+  ggtitle("Old mouse CR data") +
+  scale_y_continuous(breaks=0:80*10, limits=c(50, 80))
+```
+
 
 In your experiments, you likely have seen subgroups that appear to respond differently to the same treatment. In medicine, the effect of a treatment on a patient can depend on the patient’s age, sex, genetics, disease history, disease severity, and many other factors. When the effect of a treatment depends on the level of another variable (such as genetics, age, sex, disease severity) there is an interaction. Undetected interactions can make p-values worse or even non-significant, as we’ll demonstrate.
 
@@ -19,15 +67,7 @@ Example: how interactions can make p-values worse
 A post-doc researcher, whom we’ll call Patricia, was interested in the effects of caloric restriction (CR) on the performance of mice on a learning test. She performed an experiment and collected the following data.
 
 
-```{r}
-CR.data = data.frame(
-  CR = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "No", "No", "No", "No",  "No", "No", "No", "No"),
-  Learning.score = c(65, 68, 72, 60, 69, 71, 62, 70, 
-                   64, 67, 62, 61, 68, 63, 64, 65))
-```
-
-
-```{r}
+```{.r-output}
 CR.data
 
     CR Learning.score
@@ -54,18 +94,6 @@ The graph of learning score versus CR did not look too promising.
 
 
 ```{r}
-library(ggplot2)
-```
-
-
-```{r}
-mouse.CR.graph = ggplot(CR.data, aes(y=Learning.score, x=CR)) + 
-  geom_point() + ggtitle("Mouse CR data") + 
-  scale_y_continuous(breaks=0:80*10, limits=c(50, 80)) # Set tick every 10
-```
-
-
-```{r}
 plot(mouse.CR.graph)
 ```
 
@@ -75,7 +103,10 @@ The t-test, implemented using either the t.test function or the lm function, was
 
 ```{r}
 with(CR.data, t.test(Learning.score ~ CR, var.equal = TRUE))
+```
 
+
+```{.r-output}
 Two Sample t-test
 
 data:  Learning.score by CR
@@ -93,7 +124,10 @@ sample estimates:
 # t-test using lm
 mouse.lm.CR=with(CR.data, lm(Learning.score ~ CR))
 summary(mouse.lm.CR)
+```
 
+
+```{.r-output}
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
 (Intercept)   64.250      1.241  51.790   <2e-16 ***
@@ -104,16 +138,7 @@ CRYes          2.875      1.754   1.639    0.124
 Patricia thought that the age of the mice might affect learning scores. She went back and collected the age information. There were 10 old mice and 6 young mice.
 
 
-```{r}
-CR.Age.data = data.frame(
-  CR = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "No", "No", "No", "No",  "No", "No", "No", "No"),
-  Learning.score = c(65, 68, 72, 60, 69, 71, 62, 70, 
-                     64, 67, 62, 61, 68, 63, 64, 65),
-  Age = c("Young", "Old",  "Old", "Young", "Old", "Old", "Young", "Old", "Young", "Young", "Old", "Young",  "Old", "Old", "Old", "Old"))
-```
-
-
-```{r}
+```{.r-output}
 CR.Age.data
 
     CR Learning.score   Age
@@ -143,7 +168,10 @@ Patricia ran a 2-way analysis of variance, using the lm function, and included b
 mouse.lm.CR.Age=with(CR.Age.data, lm(Learning.score ~ CR + Age))
 
 summary(mouse.lm.CR.Age)
+```
 
+
+```{.r-output}
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
 (Intercept)   65.762      1.180  55.736   <2e-16 ***
@@ -156,13 +184,6 @@ Unfortunately, even controlling for age, the p-value for CR was not significant 
 
 
 Patricia decided to take a closer look at the graph of the learning scores, labeling them with both CR and age.
-
-
-```{r}
-mouse.interaction.graph = ggplot(CR.Age.data, aes(y=Learning.score, x=CR, group=Age, col=Age, shape=Age)) + geom_point() +
-  ggtitle("Interaction of CR with Age \nin their effect on Learning score") + 
-  scale_y_continuous(breaks=0:80*10, limits=c(50, 80)) # Set tick every 10
-```
 
 
 ```{r}
@@ -198,33 +219,24 @@ To find interactions you can examine graphs, as we have done. In addition, you u
 To perform the interaction test, you need to make one change in the R code. Here is the R code that we used before, without the interaction test:
 
 
-```{r}
-mouse.lm.CR.Age=with(CR.Age.data, lm(Learning.score ~ CR + Age))
-```
-
-
 Notice that there is a + sign in the formula (Learning.score ~ CR + Age).
 
 
 To perform the interaction test, you change the + sign in the formula to a *, like this:
 
 
-```{r}
-(Learning.score ~ CR * Age)
-```
+`Learning.score ~ CR * Age`
 
 
 Here is the R code, now with the interaction test:
 
 
 ```{r}
-mouse.lm.CR.Age.interaction =with(CR.Age.data, lm(Learning.score ~ CR * Age))
+summary(mouse.lm.CR.Age.interaction)
 ```
 
 
-```{r}
-summary(mouse.lm.CR.Age.interaction)
-
+```{.r-output}
 Coefficients:
                Estimate Std. Error t value Pr(>|t|)    
 (Intercept)      64.400      1.015  63.421  < 2e-16 ***
@@ -243,12 +255,7 @@ When you find an interaction, there are several possible ways to examine it more
 Here is the subset and graph for the young mice.
 
 
-```{r}
-young.mouse.data=subset(CR.Age.data, Age=="Young")
-```
-
-
-```{r}
+```{.r-output}
 young.mouse.data
 
     CR Learning.score   Age
@@ -262,14 +269,6 @@ young.mouse.data
 
 
 ```{r}
-young.mouse.CR.graph = ggplot(young.mouse.data, aes(y=Learning.score, x=CR)) + 
-  geom_point() +
-  ggtitle("Young mouse CR data") + 
-  scale_y_continuous(breaks=0:80*10, limits=c(50, 80))
-```
-
-
-```{r}
 plot(young.mouse.CR.graph)
 ```
 
@@ -278,13 +277,11 @@ Here is the test of learning score versus CR in the young mice.
 
 
 ```{r}
-young.mouse.lm = lm(Learning.score ~ CR, data=young.mouse.data)
+summary(young.mouse.lm)
 ```
 
 
-```{r}
-summary(young.mouse.lm)
-
+```{.r-output}
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
 (Intercept)   64.000      1.599  40.035 2.33e-06 ***
@@ -298,12 +295,7 @@ For the young mice, the p-value for CR is not significant (p = 0.5). This indica
 Next, the subset and graph for the old mice.
 
 
-```{r}
-old.mouse.data=subset(CR.Age.data, Age=="Old")
-```
-
-
-```{r}
+```{.r-output}
 old.mouse.data
 
     CR Learning.score Age
@@ -321,14 +313,6 @@ old.mouse.data
 
 
 ```{r}
-old.mouse.CR.graph = ggplot(old.mouse.data, aes(y=Learning.score, x=CR)) + 
-  geom_point() +
-  ggtitle("Old mouse CR data") + 
-  scale_y_continuous(breaks=0:80*10, limits=c(50, 80))
-```
-
-
-```{r}
 plot(old.mouse.CR.graph)
 ```
 
@@ -337,27 +321,15 @@ Here is the test of learning score versus CR in the old mice.
 
 
 ```{r}
-old.mouse.lm = lm(Learning.score ~ CR, data=old.mouse.data)
+summary(old.mouse.lm)
 ```
 
 
-```{r}
-summary(old.mouse.lm)
-
+```{.r-output}
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
 (Intercept)  64.4000     0.8832  72.919 1.39e-12 ***
 CRYes         5.6000     1.2490   4.484  0.00205 ** 
-```
-
-
-```
-
-```
-
-
-```
-
 ```
 
 
@@ -414,3 +386,6 @@ The short answer is, if you have sufficient data, it is likely a good idea to al
 
 
 Ideally, when you write your experimental plan, you should pre-specify what interactions you will test for. The list should be based on your knowledge of what variables are most likely to interact. Doing a lot of post-hoc interaction tests can cause problems with multiple hypothesis testing. If you do find interactions by post-hoc testing, consider it to be a hypothesis-generating exercise that requires further experiments for confirmation.
+
+
+
